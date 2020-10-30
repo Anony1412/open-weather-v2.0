@@ -3,28 +3,57 @@ import 'package:flutter/material.dart';
 import 'package:open_weather_v2/src/resources/Images.dart';
 import 'package:open_weather_v2/src/resources/dimens.dart';
 import 'package:open_weather_v2/src/resources/strings.dart';
-import 'package:open_weather_v2/src/ui/screens/home/widgets/weather_item.dart';
-import 'package:open_weather_v2/src/utils/appbar_builder.dart';
+import 'package:open_weather_v2/src/ui/screens/home/viewmodel/home_viewmodel.dart';
+import 'package:scoped_model/scoped_model.dart';
 
-class HomeScreen extends StatelessWidget {
+import 'widgets/weather_item.dart';
+
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenSate createState() => _HomeScreenSate();
+}
+
+class _HomeScreenSate extends State<HomeScreen> {
   final _gradientColors = [Colors.lightBlueAccent, Colors.blueAccent];
+
+  WeatherViewModel homeViewModel = WeatherViewModel();
+
+  // WeatherDetail weatherDetail;
+
+  @override
+  void initState() {
+    super.initState();
+    // ScopedModel.of<HomeViewModel>(context, rebuildOnChange: true)
+    //     .getWeatherByCityName("hanoi,vn");
+    homeViewModel.getWeatherByCityName("hanoi,vn");
+  }
 
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
 
-    final _textCityName = Container(
-      height: deviceSize.height / 10,
-      child: Center(
-        child: Text(
-          "Hanoi, Vietnam",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 40.0,
+    // weatherDetail =
+    //     ScopedModel.of<HomeViewModel>(context, rebuildOnChange: true)
+    //         .weatherDetail;
+
+    final _textCityName = ScopedModelDescendant(
+      builder: (BuildContext context, Widget child, WeatherViewModel model) {
+        return Container(
+          height: deviceSize.height / 10,
+          child: Center(
+            child: Text(
+              (model.weatherDetail != null)
+                  ? model.weatherDetail.cityName
+                  : "update",
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 40.0,
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
 
     final _boxWeatherTodayDecoration = BoxDecoration(
@@ -57,17 +86,24 @@ class HomeScreen extends StatelessWidget {
                 SizedBox(height: Dimens.smallMarginContentWidth),
                 Expanded(
                   flex: 2,
-                  child: Container(
-                    child: Center(
-                      child: Text(
-                        "25°",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 80,
+                  child: ScopedModelDescendant(
+                    builder: (context, child, WeatherViewModel model) {
+                      return Container(
+                        child: Center(
+                          child: Text(
+                            (model.weatherDetail != null)
+                                ? model.weatherDetail.temperature.temperature
+                                    .toString()
+                                : "update",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 80,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -93,18 +129,26 @@ class HomeScreen extends StatelessWidget {
                 ),
                 SizedBox(height: Dimens.smallMarginContentWidth),
                 Expanded(
-                  child: Container(
-                    child: Center(
-                      child: Text(
-                        "Feel like: 20°",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FontStyle.italic,
-                          fontSize: 32,
+                  child: ScopedModelDescendant(
+                    builder: (context, child, WeatherViewModel model) {
+                      return Container(
+                        child: Center(
+                          child: Text(
+                            (model.weatherDetail != null)
+                                ? model.weatherDetail.temperature
+                                    .temperatureFeelLike
+                                    .toString()
+                                : "update",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.italic,
+                              fontSize: 32,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -140,10 +184,10 @@ class HomeScreen extends StatelessWidget {
       child: Container(
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
-            itemCount: 10,
-            itemBuilder: (BuildContext context, int index) {
-              return WeatherItem("Monday", "25°", "rain");
-            },
+          itemCount: 10,
+          itemBuilder: (BuildContext context, int index) {
+            return WeatherItem("Monday", "25°", "rain");
+          },
         ),
       ),
     );
@@ -160,22 +204,25 @@ class HomeScreen extends StatelessWidget {
       ),
     );
 
-    return Scaffold(
-      body: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: Dimens.defaultPaddingScreenHorizontal,
-          vertical: Dimens.defaultPaddingScreenVertical,
-        ),
-        color: Colors.transparent,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            _textCityName,
-            SizedBox(height: Dimens.defaultMarginContentHeight),
-            _boxWeatherToday,
-            SizedBox(height: Dimens.defaultMarginContentHeight),
-            _listWeatherOnWeek
-          ],
+    return ScopedModel<WeatherViewModel>(
+      model: homeViewModel,
+      child: Scaffold(
+        body: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: Dimens.defaultPaddingScreenHorizontal,
+            vertical: Dimens.defaultPaddingScreenVertical,
+          ),
+          color: Colors.transparent,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              _textCityName,
+              SizedBox(height: Dimens.defaultMarginContentHeight),
+              _boxWeatherToday,
+              SizedBox(height: Dimens.defaultMarginContentHeight),
+              _listWeatherOnWeek
+            ],
+          ),
         ),
       ),
     );

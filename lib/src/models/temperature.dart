@@ -1,9 +1,9 @@
 class Temperature {
-  final String temperature;
-  final String temperatureMin;
-  final String temperatureMax;
-  final String temperatureFeelLike;
-  final String humidity;
+  final double temperature;
+  final double temperatureMin;
+  final double temperatureMax;
+  final double temperatureFeelLike;
+  final int humidity;
 
   Temperature({
     this.temperature,
@@ -12,4 +12,14 @@ class Temperature {
     this.temperatureFeelLike,
     this.humidity,
   });
+
+  factory Temperature.fromJson(Map<String, dynamic> json) {
+    return Temperature(
+      temperature: json["temp"],
+      temperatureMin: json["temp_min"],
+      temperatureMax: json["temp_max"],
+      temperatureFeelLike: json["feels_like"],
+      humidity: json["humidity"],
+    );
+  }
 }

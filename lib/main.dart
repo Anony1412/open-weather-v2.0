@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:open_weather_v2/src/resources/strings.dart';
+import 'package:open_weather_v2/src/ui/screens/detail/detail_screen.dart';
 import 'package:open_weather_v2/src/ui/screens/home/home_screen.dart';
-import 'package:open_weather_v2/src/ui/screens/item_detail/detail_screen.dart';
 import 'package:open_weather_v2/src/ui/screens/splash/splash_screen.dart';
 
 void main() => runApp(MyApp());
